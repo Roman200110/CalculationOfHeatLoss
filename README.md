@@ -30,11 +30,23 @@
 
 Источник 5: [Методические рекомендации по оценке энергосберегающий мероприятий](http://sro61.ru/docs/metodiki/Met.rek-cii-po-ocenke_effektivnosti_e-sb.mer..pdf)
 
-Источник 6: [Презентация кейса]()
+Источник 6: [Презентация кейса](https://github.com/Roman200110/CalculationOfHeatLoss/raw/master/Resources/%D0%9A%D0%B5%D0%B9%D1%81.pptx)
 
 ### Дополнительные источники данных для сегментации элементов фасада
 
+Источник 1. [eTRIMS Image Database](http://www.ipb.uni-bonn.de/projects/etrims_db/)
 
+Источник 2. [LabelMeFacade Database](https://www.inf-cv.uni-jena.de/Research/Datasets/LabelMeFacade.html)
+
+Источник 3. [Ecole Centrale Paris Facades Database](http://vision.mas.ecp.fr/Personnel/teboul/data.php)
+
+Источник 4. [CMP Facade Database](https://cmp.felk.cvut.cz/~tylecr1/facade/)
+
+Источник 5. [ICG Graz50 Facade Dataset](http://www.vision.ee.ethz.ch/~rhayko/paper/cvpr2012_riemenschneider_lattice/graz50_facade_dataset.zip)
+
+Источник 6. [Zurich Buildings Database](https://icu.ee.ethz.ch/research/datsets.html)
+
+Источник 7. [VarCity Dataset](http://www.varcity.ethz.ch/3dchallenge/index.html)
 
 ### Постановщик
 
