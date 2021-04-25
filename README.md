@@ -1,53 +1,103 @@
-## Репозиторий команды *AirWorker-Improvis* на [Авиахакатоне 2021](https://aviahackathon.mai.ru/)
+# Yolo_mark
+**Windows** & **Linux** GUI for marking bounded boxes of objects in images for training Yolo v3 and v2
 
-## Кейс - Энергоаудит зданий с применением БПЛА
+* To compile on **Windows** open `yolo_mark.sln` in MSVS2013/2015, compile it **x64 & Release** and run the file: `x64/Release/yolo_mark.cmd`. Change paths in `yolo_mark.sln` to the OpenCV 2.x/3.x installed on your computer:
 
-### Краткое описание
+    * (right click on project) -> properties -> C/C++ -> General -> Additional Include Directories: `C:\opencv_3.0\opencv\build\include;`
+        
+    * (right click on project) -> properties -> Linker -> General -> Additional Library Directories: `C:\opencv_3.0\opencv\build\x64\vc14\lib;`
 
-Развитие сервисов по поиску и обнаружению утечек тепловых потерь на основе тепловизионной съёмки с БПЛА
+* To compile on **Linux** type in console 3 commands:
+    ```
+    cmake .
+    make
+    ./linux_mark.sh
+    ```
 
-### Текущая ситуация
+Supported both: OpenCV 2.x and OpenCV 3.x
 
-Ежегодно МАИ выделяют средства избюджета для оплаты отопления обслуживающим организациям. Эта сумма фиксированная. За счет мероприятий по энергосбережению, возможно сэкономить потребление, а следовательно и расходы на отопление. Сумма выделяемых средств при этом не уменьшится и возникнет положительный остаток  
+--------
 
-### Проблема
-Обычно решения по тепловизионной съемке дают представление о местах утечек, но не дают понимания об объёме теплопотерь, не предоставляют рекомендаций по мероприятиям в области энергосбережения. 
-Не существует решения, которое позволило бы с помощью БПЛА произвести исследования теплопотерь на высокоэтажных зданиях с высокой точность. 
+1. To test, simply run 
+  * **on Windows:** `x64/Release/yolo_mark.cmd`
+  * **on Linux:** `./linux_mark.sh`
 
-### Задача
-Разработать решение, которое будет строить карту полета БПЛА вокруг здания и строить 3d-карту теплопотерь здания на основе сделанных фотографий (фотограмметрия). Решение, также должно делать расчет мест для наиболее эффективного утепления и оценивать экономический эффект от подобных мер.
-Создать приложение, позволяющее по материалам тепловизионной съёмки с БПЛА оценить объёмы теплопотерь через различные поверхности здания (окна, стены и т.д.) для каждого типа поверхности оценить эффект (технический и экономический) от мероприятий по энергосбережению. Результаты представить в виде отчета.
+2. To use for labeling your custom images:
 
-### Данные
+ * delete all files from directory `x64/Release/data/img`
+ * put your `.jpg`-images to this directory `x64/Release/data/img`
+ * change numer of classes (objects for detection) in file `x64/Release/data/obj.data`: https://github.com/AlexeyAB/Yolo_mark/blob/master/x64/Release/data/obj.data#L1
+ * put names of objects, one for each line in file `x64/Release/data/obj.names`: https://github.com/AlexeyAB/Yolo_mark/blob/master/x64/Release/data/obj.names
+ * run file: `x64\Release\yolo_mark.cmd`
 
-Источник 1: [Тарифы на тепловую энергию](https://www.mos.ru/depr/function/tarifnaya-politika/tarify-na-zku-na-2020-god/)
+3. To training for your custom objects, you should change 2 lines in file `x64/Release/yolo-obj.cfg`:
 
-Источник 2: [Методика расчета теплопотерь стен здания](https://www.calc.ru/Teplopoteri-Doma-Raschet-Teplopoter.html)
+ * set number of classes (objects): https://github.com/AlexeyAB/Yolo_mark/blob/master/x64/Release/yolo-obj.cfg#L230
+ * set `filter`-value 
+   * For Yolov2 `(classes + 5)*5`: https://github.com/AlexeyAB/Yolo_mark/blob/master/x64/Release/yolo-obj.cfg#L224
+   * For Yolov3 `(classes + 5)*3`
 
-Источник 3: [Пример отчета о тепловизионном обследования дома](https://energo-audit.com/otchet-po-teplovizionnomu-obsledovaniu-zhylogo-doma)
+ 3.1 Download pre-trained weights for the convolutional layers (76 MB): http://pjreddie.com/media/files/darknet19_448.conv.23 
+ 
+ 3.2 Put files: `yolo-obj.cfg`, `data/train.txt`, `data/obj.names`, `data/obj.data`, `darknet19_448.conv.23` and directory `data/img` near with executable `darknet`-file, and start training: `darknet detector train data/obj.data yolo-obj.cfg darknet19_448.conv.23`
 
-Источник 4: [Тепловизионная съёмка с БПЛА](https://disk.yandex.ru/d/56S7eTHSLGFkhA/20210324_202838?w=1)
+For a detailed description, see: https://github.com/AlexeyAB/darknet#how-to-train-to-detect-your-custom-objects
 
-Источник 5: [Методические рекомендации по оценке энергосберегающий мероприятий](http://sro61.ru/docs/metodiki/Met.rek-cii-po-ocenke_effektivnosti_e-sb.mer..pdf)
+----
 
-Источник 6: [Презентация кейса](https://github.com/Roman200110/CalculationOfHeatLoss/raw/master/Resources/%D0%9A%D0%B5%D0%B9%D1%81.pptx)
+#### How to get frames from videofile:
 
-### Дополнительные источники данных для сегментации элементов фасада
+To get frames from videofile (save each N frame, in example N=10), you can use this command:
+* on Windows: `yolo_mark.exe data/img cap_video test.mp4 10`
+* on Linux: `./yolo_mark x64/Release/data/img cap_video test.mp4 10`
 
-Источник 1. [eTRIMS Image Database](http://www.ipb.uni-bonn.de/projects/etrims_db/)
+Directory `data/img` should be created before this. Also on Windows, the file `opencv_ffmpeg340_64.dll` from `opencv\build\bin` should be placed near with `yolo_mark.exe`.
 
-Источник 2. [LabelMeFacade Database](https://www.inf-cv.uni-jena.de/Research/Datasets/LabelMeFacade.html)
+As a result, many frames will be collected in the directory `data/img`. Then you can label them manually using such command: 
+* on Windows: `yolo_mark.exe data/img data/train.txt data/obj.names`
+* on Linux: `./yolo_mark x64/Release/data/img x64/Release/data/train.txt x64/Release/data/obj.names`
 
-Источник 3. [Ecole Centrale Paris Facades Database](http://vision.mas.ecp.fr/Personnel/teboul/data.php)
+----
 
-Источник 4. [CMP Facade Database](https://cmp.felk.cvut.cz/~tylecr1/facade/)
+#### Here are:
 
-Источник 5. [ICG Graz50 Facade Dataset](http://www.vision.ee.ethz.ch/~rhayko/paper/cvpr2012_riemenschneider_lattice/graz50_facade_dataset.zip)
+* /x64/Release/
+  * `yolo_mark.cmd` - example hot to use yolo mark: `yolo_mark.exe data/img data/train.txt data/obj.names`
+  * `train_obj.cmd` - example how to train yolo for your custom objects (put this file near with darknet.exe): `darknet.exe detector train data/obj.data yolo-obj.cfg darknet19_448.conv.23`
+  * `yolo-obj.cfg` - example of yoloV3-neural-network for 2 object
+* /x64/Release/data/
+  * `obj.names` - example of list with object names
+  * `obj.data` - example with configuration for training Yolo v3
+  * `train.txt` - example with list of image filenames for training Yolo v3
+  
+* /x64/Release/data/img/`air4.txt` - example with coordinates of objects on image `air4.jpg` with aircrafts (class=0)
 
-Источник 6. [Zurich Buildings Database](https://icu.ee.ethz.ch/research/datsets.html)
+![Image of Yolo_mark](https://habrastorage.org/files/229/f06/277/229f06277fcc49279342b7edfabbb47a.jpg)
 
-Источник 7. [VarCity Dataset](http://www.varcity.ethz.ch/3dchallenge/index.html)
+### Instruction manual
 
-### Постановщик
+#### Mouse control
 
-![Provider Logo](http://aviahack.mai.ru/media/ck_uav.png)
+Button | Description | 
+--- | --- |
+Left | Draw box
+Right | Move box
+
+#### Keyboard Shortcuts
+
+Shortcut | Description | 
+--- | --- |
+<kbd>→</kbd> | Next image |
+<kbd>←</kbd> | Previous image |
+<kbd>r</kbd> | Delete selected box (mouse hovered) |
+<kbd>c</kbd> | Clear all marks on the current image |
+<kbd>p</kbd> | Copy previous mark |
+<kbd>o</kbd> | Track objects |
+<kbd>ESC</kbd> | Close application |
+<kbd>n</kbd> | One object per image |
+<kbd>0-9</kbd> | Object id |
+<kbd>m</kbd> | Show coords |
+<kbd>w</kbd> | Line width |
+<kbd>k</kbd> | Hide object name |
+<kbd>h</kbd> | Help |
+
